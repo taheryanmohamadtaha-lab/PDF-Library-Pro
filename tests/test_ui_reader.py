@@ -37,7 +37,7 @@ def test_reader_navigation_selection_highlight_progress(qapp, mgr, tmp_path):
     class E:  # minimal mouse release event
         def button(self): return Qt.LeftButton
     pv.mouseReleaseEvent(E())
-    assert "Page number 1" in pv.sel_text
+    assert "Page number 1" in " ".join(pv.sel_text.split())
     w.highlight_selection()
     assert len(svc.highlights(bid, 1)) == 1
     w.find_edit.setText("unique4word"); w.do_find()

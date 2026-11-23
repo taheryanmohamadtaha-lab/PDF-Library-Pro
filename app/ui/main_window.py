@@ -323,11 +323,9 @@ class MainWindow(QMainWindow):
         self.pbar.setRange(0, 0)
         self.pbar.show()
         self.cancel_btn.show()
-        try:
-            self.cancel_btn.clicked.disconnect()
-        except Exception:
-            pass
-        self.cancel_btn.clicked.connect(task.cancel)
+        if getattr(self, "_cancel_conn", None) is not None:
+            self.cancel_btn.clicked.disconnect(self._cancel_conn)
+        self._cancel_conn = self.cancel_btn.clicked.connect(task.cancel)
 
         def prog(a, b, msg):
             if b:

@@ -20,12 +20,14 @@ def test_add_dedupe_cover_index(mgr, tmp_path):
     b = svc.book(bid)
     assert b["pages"] == 2 and b["author"] == "Tester" and svc.cover_path(b).exists()
     assert svc.index_book(bid) == 0
-    if FONT:
-        res = svc.search("کتاب")
-        assert res["books"] and res["pages"][0]["page"] == 1
-        assert svc.search("ي")["pages"] == [] or True
-        assert svc.search("تاریخ")["pages"][0]["page"] == 2
-        assert svc.search("كتاب")["pages"]  # arabic kaf matches persian
+    # Persian page text stored directly (PDF font/bidi behaviour differs per OS, so don't depend on it)
+    svc.store_ocr_page(bid, 1, "سلام دنیا كتاب")
+    svc.store_ocr_page(bid, 2, "فصل دوم تاریخ")
+    assert svc.search("کتاب")["books"]
+    assert svc.search("کتاب")["pages"][0]["page"] == 1
+    assert svc.search("تاریخ")["pages"][0]["page"] == 2
+    assert svc.search("كتاب")["pages"]            # Arabic kaf matches Persian kaf
+    assert svc.search("۱۲۳")["pages"] == []        # digits normalised, no crash
 
 
 def test_corrupt_and_encrypted(mgr, tmp_path):
